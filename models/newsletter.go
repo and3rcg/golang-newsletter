@@ -1,7 +1,11 @@
 package models
 
+import "gorm.io/gorm"
+
 type Newsletter struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	gorm.Model
+
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	EmailList   []string `json:"email_list" gorm:"type:text[];default:[]"`
 }

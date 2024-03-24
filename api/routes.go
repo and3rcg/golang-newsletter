@@ -1,9 +1,37 @@
 package api
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"newsletter-go/internal"
 
-func SetUpAPIRoutes(app *fiber.App) {
-	apiGroup := app.Group("/api")
+	"github.com/gofiber/fiber/v2"
+)
 
-	apiGroup.Post("/send-email", SendEmail)
+func SetUpAPIRoutes(app *fiber.App, repo *internal.Repository) {
+	newsletterGroup := app.Group("/api/newsletter")
+
+	newsletterGroup.Post("/", func(c *fiber.Ctx) error {
+		return CreateNewsletterHandler(c, repo)
+	})
+
+	newsletterGroup.Get("/", func(c *fiber.Ctx) error {
+		return GetNewsletterListHandler(c, repo)
+	})
+
+	newsletterGroup.Get("/:id", func(c *fiber.Ctx) error {
+		return GetNewsletterHandler(c, repo)
+	})
+
+	newsletterGroup.Patch("/:id", func(c *fiber.Ctx) error {
+		return UpdateNewsletterHandler(c, repo)
+	})
+
+	newsletterGroup.Delete("/:id", func(c *fiber.Ctx) error {
+		return DeleteNewsletterHandler(c, repo)
+	})
+
+	emailGroup := app.Group("/api/email")
+
+	emailGroup.Post("/send", func(c *fiber.Ctx) error {
+		return SendEmailHandler(c, repo)
+	})
 }

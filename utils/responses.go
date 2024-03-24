@@ -21,22 +21,22 @@ func AcceptedResponse(c *fiber.Ctx, message string) error {
 	return newResponse(c, fiber.StatusAccepted, message, nil)
 }
 
-func BadRequestResponse(c *fiber.Ctx, message string, data fiber.Map) error {
-	return newResponse(c, fiber.StatusBadRequest, message, data)
+func BadRequestResponse(c *fiber.Ctx, message string) error {
+	return newResponse(c, fiber.StatusBadRequest, message, nil)
 }
 
-func NotFoundResponse(c *fiber.Ctx, message string, data fiber.Map) error {
-	return newResponse(c, fiber.StatusNotFound, message, data)
+func NotFoundResponse(c *fiber.Ctx, message string) error {
+	return newResponse(c, fiber.StatusNotFound, message, nil)
 }
 
-func InternalServerErrorResponse(c *fiber.Ctx, message string, data fiber.Map) error {
-	return newResponse(c, fiber.StatusInternalServerError, message, data)
+func InternalServerErrorResponse(c *fiber.Ctx, message string) error {
+	return newResponse(c, fiber.StatusInternalServerError, message, nil)
 }
 
-func UnauthorizedResponse(c *fiber.Ctx, message string, data fiber.Map) error {
-	return newResponse(c, fiber.StatusUnauthorized, message, data)
+func UnauthorizedResponse(c *fiber.Ctx, message string) error {
+	return newResponse(c, fiber.StatusUnauthorized, message, nil)
 }
 
-func ForbiddenResponse(c *fiber.Ctx, message string, data fiber.Map) error {
-	return newResponse(c, fiber.StatusForbidden, message, data)
+func ForbiddenResponse(c *fiber.Ctx, message string) error {
+	return newResponse(c, fiber.StatusForbidden, message, nil)
 }
