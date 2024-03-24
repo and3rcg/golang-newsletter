@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"newsletter-go/internal"
 	"newsletter-go/models"
+	"slices"
 )
 
 func CreateNewsletterOperation(repo *internal.Repository, obj *models.Newsletter) error {
@@ -45,5 +47,53 @@ func DeleteNewsletterOperation(repo *internal.Repository, id int) error {
 	if result.Error != nil {
 		return result.Error
 	}
+	return nil
+}
+
+func SubscribeToNewsletterOperation(repo *internal.Repository, email string, id int) error {
+	var obj models.Newsletter
+	result := repo.DB.Where("id = ?", id).First(&obj)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// checking if the e-mail is already subscribed to the newsletter
+	dupeIdx := slices.Index(obj.EmailList, email)
+	if dupeIdx != -1 {
+		return errors.New("e-mail address already subscribed to newsletter")
+	}
+
+	obj.EmailList = append(obj.EmailList, email)
+
+	result = repo.DB.Save(&obj)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func UnsubscribeFromNewsletterOperation(repo *internal.Repository, email string, id int) error {
+	var obj models.Newsletter
+	result := repo.DB.Where("id = ?", id).First(&obj)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// checking if the e-mail is actually subscribed to the newsletter
+	dupeIdx := slices.Index(obj.EmailList, email)
+	if dupeIdx == -1 {
+		return nil
+	}
+
+	obj.EmailList = append(obj.EmailList[:dupeIdx], obj.EmailList[dupeIdx+1:]...)
+
+	result = repo.DB.Save(&obj)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }

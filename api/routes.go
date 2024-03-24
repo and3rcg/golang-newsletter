@@ -29,6 +29,14 @@ func SetUpAPIRoutes(app *fiber.App, repo *internal.Repository) {
 		return DeleteNewsletterHandler(c, repo)
 	})
 
+	newsletterGroup.Post("/subscribe", func(c *fiber.Ctx) error {
+		return SubscribeToNewsletterHandler(c, repo)
+	})
+
+	newsletterGroup.Post("/unsubscribe", func(c *fiber.Ctx) error {
+		return UnsubscribeFromNewsletterHandler(c, repo)
+	})
+
 	emailGroup := app.Group("/api/email")
 
 	emailGroup.Post("/send", func(c *fiber.Ctx) error {

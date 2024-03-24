@@ -10,12 +10,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// CreateNewsletterHandler creates a newsletter instance
 func CreateNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	var request models.Newsletter
 
 	err := c.BodyParser(&request)
 	if err != nil {
 		return utils.BadRequestResponse(c, "Failed to parse request body")
+	}
+
+	validationErrs := r.Validator.Struct(request)
+	if validationErrs != nil {
+		return utils.BadRequestResponse(c, validationErrs.Error())
 	}
 
 	err = CreateNewsletterOperation(r, &request)
@@ -28,6 +34,7 @@ func CreateNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	})
 }
 
+// GetNewsletterHandler retrieves a single newsletter instance
 func GetNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	idString := c.Params("id", "")
 
@@ -49,6 +56,7 @@ func GetNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	})
 }
 
+// GetNewsletterListHandler retrieves a list of all newsletters
 func GetNewsletterListHandler(c *fiber.Ctx, r *internal.Repository) error {
 	newsletterList, err := GetAllNewslettersOperation(r)
 
@@ -61,6 +69,7 @@ func GetNewsletterListHandler(c *fiber.Ctx, r *internal.Repository) error {
 	})
 }
 
+// UpdateNewsletterHandler updates a newsletter instance
 func UpdateNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	var request models.Newsletter
 	idString := c.Params("id", "")
@@ -76,6 +85,11 @@ func UpdateNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 		return utils.BadRequestResponse(c, "Failed to parse request body")
 	}
 
+	validationErrs := r.Validator.Struct(request)
+	if validationErrs != nil {
+		return utils.BadRequestResponse(c, validationErrs.Error())
+	}
+
 	err = UpdateNewsletterOperation(r, &request, id)
 	if err == gorm.ErrRecordNotFound {
 		return utils.NotFoundResponse(c, "Newsletter not found")
@@ -86,6 +100,7 @@ func UpdateNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	return utils.OkResponse(c, "Newsletter updated successfully", nil)
 }
 
+// DeleteNewsletterHandler deletes a newsletter instance
 func DeleteNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	idString := c.Params("id", "")
 
@@ -102,4 +117,60 @@ func DeleteNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	}
 
 	return utils.OkResponse(c, "Newsletter deleted successfully", nil)
+}
+
+// SubscribeToNewsletterHandler adds an email address to the specified newsletter. Duplicate email addresses are not allowed.
+func SubscribeToNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
+	type requestBody struct {
+		Email        string `json:"email" validate:"required,valid_email"`
+		NewsletterID int    `json:"newsletter_id" validate:"required"`
+	}
+	var request requestBody
+
+	err := c.BodyParser(&request)
+	if err != nil {
+		return utils.BadRequestResponse(c, "Failed to parse request body")
+	}
+
+	validationErrs := r.Validator.Struct(request)
+	if validationErrs != nil {
+		return utils.BadRequestResponse(c, validationErrs.Error())
+	}
+
+	err = SubscribeToNewsletterOperation(r, request.Email, request.NewsletterID)
+	if err == gorm.ErrRecordNotFound {
+		return utils.NotFoundResponse(c, "Newsletter not found")
+	} else if err != nil {
+		return utils.InternalServerErrorResponse(c, err.Error())
+	}
+
+	return utils.OkResponse(c, "E-mail added successfully", nil)
+}
+
+// UnsubscribeFromNewsletterHandler removes an e-mail address from the specified newsletter. Duplicates are not allowed.
+func UnsubscribeFromNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
+	type requestBody struct {
+		Email        string `json:"email" validate:"required,valid_email"`
+		NewsletterID int    `json:"newsletter_id" validate:"required"`
+	}
+	var request requestBody
+
+	err := c.BodyParser(&request)
+	if err != nil {
+		return utils.BadRequestResponse(c, "Failed to parse request body")
+	}
+
+	validationErrs := r.Validator.Struct(request)
+	if validationErrs != nil {
+		return utils.BadRequestResponse(c, validationErrs.Error())
+	}
+
+	err = UnsubscribeFromNewsletterOperation(r, request.Email, request.NewsletterID)
+	if err == gorm.ErrRecordNotFound {
+		return utils.NotFoundResponse(c, "Newsletter not found")
+	} else if err != nil {
+		return utils.InternalServerErrorResponse(c, err.Error())
+	}
+
+	return utils.OkResponse(c, "E-mail removed successfully", nil)
 }

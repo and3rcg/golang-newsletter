@@ -15,7 +15,7 @@ func main() {
 		AppName:       "Newsletters in Go",
 	})
 
-	repo, err := internal.StartDB()
+	repo, err := internal.StartRepository()
 	if err != nil {
 		log.Fatal(err)
 	}
