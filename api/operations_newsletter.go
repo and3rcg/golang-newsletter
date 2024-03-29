@@ -1,14 +1,13 @@
 package api
 
 import (
-	"errors"
 	"newsletter-go/internal"
 	"newsletter-go/models"
-	"slices"
+
+	"gorm.io/gorm"
 )
 
 func CreateNewsletterOperation(repo *internal.Repository, obj *models.Newsletter) error {
-	obj.EmailList = []string{} // initializing empty list
 	result := repo.DB.Create(obj)
 	if result.Error != nil {
 		return result.Error
@@ -18,7 +17,7 @@ func CreateNewsletterOperation(repo *internal.Repository, obj *models.Newsletter
 
 func GetNewsletterByIDOperation(repo *internal.Repository, id int) (*models.Newsletter, error) {
 	var obj models.Newsletter
-	result := repo.DB.Where("id = ?", id).First(&obj)
+	result := repo.DB.Preload("Users").Where("id = ?", id).First(&obj)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -50,23 +49,8 @@ func DeleteNewsletterOperation(repo *internal.Repository, id int) error {
 	return nil
 }
 
-func SubscribeToNewsletterOperation(repo *internal.Repository, email string, id int) error {
-	var obj models.Newsletter
-	result := repo.DB.Where("id = ?", id).First(&obj)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	// checking if the e-mail is already subscribed to the newsletter
-	dupeIdx := slices.Index(obj.EmailList, email)
-	if dupeIdx != -1 {
-		return errors.New("e-mail address already subscribed to newsletter")
-	}
-
-	obj.EmailList = append(obj.EmailList, email)
-
-	result = repo.DB.Save(&obj)
+func SubscribeToNewsletterOperation(repo *internal.Repository, user *models.NewsletterUser) error {
+	result := repo.DB.Create(user)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -74,23 +58,17 @@ func SubscribeToNewsletterOperation(repo *internal.Repository, email string, id 
 	return nil
 }
 
-func UnsubscribeFromNewsletterOperation(repo *internal.Repository, email string, id int) error {
-	var obj models.Newsletter
-	result := repo.DB.Where("id = ?", id).First(&obj)
+func UnsubscribeFromNewsletterOperation(repo *internal.Repository, email string, newsletterID uint) error {
+	var user models.NewsletterUser
 
-	if result.Error != nil {
+	result := repo.DB.Where("newsletter_id = ? AND email = ?", newsletterID, email).First(&user)
+	if result.Error == gorm.ErrRecordNotFound {
+		return nil
+	} else if result.Error != nil {
 		return result.Error
 	}
 
-	// checking if the e-mail is actually subscribed to the newsletter
-	dupeIdx := slices.Index(obj.EmailList, email)
-	if dupeIdx == -1 {
-		return nil
-	}
-
-	obj.EmailList = append(obj.EmailList[:dupeIdx], obj.EmailList[dupeIdx+1:]...)
-
-	result = repo.DB.Save(&obj)
+	result = repo.DB.Delete(user)
 	if result.Error != nil {
 		return result.Error
 	}

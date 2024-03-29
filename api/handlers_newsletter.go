@@ -121,11 +121,7 @@ func DeleteNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 
 // SubscribeToNewsletterHandler adds an email address to the specified newsletter. Duplicate email addresses are not allowed.
 func SubscribeToNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
-	type requestBody struct {
-		Email        string `json:"email" validate:"required,valid_email"`
-		NewsletterID int    `json:"newsletter_id" validate:"required"`
-	}
-	var request requestBody
+	var request models.NewsletterUser
 
 	err := c.BodyParser(&request)
 	if err != nil {
@@ -137,7 +133,7 @@ func SubscribeToNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 		return utils.BadRequestResponse(c, validationErrs.Error())
 	}
 
-	err = SubscribeToNewsletterOperation(r, request.Email, request.NewsletterID)
+	err = SubscribeToNewsletterOperation(r, &request)
 	if err == gorm.ErrRecordNotFound {
 		return utils.NotFoundResponse(c, "Newsletter not found")
 	} else if err != nil {
@@ -150,8 +146,8 @@ func SubscribeToNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 // UnsubscribeFromNewsletterHandler removes an e-mail address from the specified newsletter. Duplicates are not allowed.
 func UnsubscribeFromNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	type requestBody struct {
-		Email        string `json:"email" validate:"required,valid_email"`
-		NewsletterID int    `json:"newsletter_id" validate:"required"`
+		Email        string `json:"email" validate:"required"`
+		NewsletterID uint   `json:"newsletter_id" validate:"required"`
 	}
 	var request requestBody
 

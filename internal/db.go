@@ -4,8 +4,10 @@ import (
 	"log"
 	"net/mail"
 	"newsletter-go/models"
+	"os"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/mailersend/mailersend-go"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -13,6 +15,7 @@ import (
 type Repository struct {
 	DB        *gorm.DB
 	Validator *validator.Validate
+	MS        *mailersend.Mailersend
 	// Redis
 }
 
@@ -26,7 +29,7 @@ func StartRepository() (*Repository, error) {
 	}
 
 	log.Println("Running migrations...")
-	db.AutoMigrate(&models.Newsletter{})
+	db.AutoMigrate(&models.Newsletter{}, &models.NewsletterUser{})
 
 	repoObj := &Repository{DB: db}
 
@@ -39,6 +42,11 @@ func StartRepository() (*Repository, error) {
 		_, err := mail.ParseAddress(f1.Field().String())
 		return err == nil
 	})
+
+	log.Println("Starting MailerSend library...")
+	ms := mailersend.NewMailersend(os.Getenv("MAILERSEND_API_KEY"))
+
+	repoObj.MS = ms
 
 	return repoObj, nil
 }

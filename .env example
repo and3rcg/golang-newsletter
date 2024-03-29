@@ -1,0 +1,2 @@
+# Get an API key from MailerSend and replace it here, then rename this file to .env
+MAILERSEND_API_KEY="INSERT_YOUR_MAILERSEND_API_KEY_HERE"

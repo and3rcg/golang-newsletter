@@ -37,9 +37,7 @@ func SetUpAPIRoutes(app *fiber.App, repo *internal.Repository) {
 		return UnsubscribeFromNewsletterHandler(c, repo)
 	})
 
-	emailGroup := app.Group("/api/email")
-
-	emailGroup.Post("/send", func(c *fiber.Ctx) error {
-		return SendEmailHandler(c, repo)
+	newsletterGroup.Post("/:id/send-emails", func(c *fiber.Ctx) error {
+		return SendNewsletterEmailsHandler(c, repo)
 	})
 }
