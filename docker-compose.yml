@@ -1,0 +1,21 @@
+version: "3.8"
+
+# courtesy of gemini
+
+services:
+  redis:
+    image: redis:latest
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}  # Gets the password from the .env file
+    volumes:
+      - redis-data:/data  # Persistent data volume
+    ports:
+      - "6379:6379"  # Map port 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "ping"]
+      interval: 10s  # Check every 10 seconds
+      timeout: 5s  # Timeout after 5 seconds
+      retries: 3  # Retry 3 times before considering unhealthy
+
+volumes:
+  redis-data:  # Define the data volume

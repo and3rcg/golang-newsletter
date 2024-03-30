@@ -4,6 +4,7 @@ import (
 	"log"
 	"newsletter-go/api"
 	"newsletter-go/internal"
+	"newsletter-go/tasks"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -25,6 +26,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// starting up the worker client
+	tasks.InitWorkerClient()
+	defer tasks.CloseWorkerClient()
 
 	// setup routes
 	api.SetUpAPIRoutes(app, repo)

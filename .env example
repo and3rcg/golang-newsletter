@@ -1,2 +1,5 @@
 # Get an API key from MailerSend and replace it here, then rename this file to .env
 MAILERSEND_API_KEY="INSERT_YOUR_MAILERSEND_API_KEY_HERE"
+REDIS_HOST=localhost:6379  # or <REDIS_CONTAINER_NAME>:6379 if running on docker
+REDIS_PASSWORD=<REDIS_PASSWORD>
+MAILERSEND_DOMAIN=<INSERT_YOUR_MAILERSEND_DOMAIN_HERE>

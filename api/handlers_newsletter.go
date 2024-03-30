@@ -145,23 +145,14 @@ func SubscribeToNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 
 // UnsubscribeFromNewsletterHandler removes an e-mail address from the specified newsletter. Duplicates are not allowed.
 func UnsubscribeFromNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
-	type requestBody struct {
-		Email        string `json:"email" validate:"required"`
-		NewsletterID uint   `json:"newsletter_id" validate:"required"`
-	}
-	var request requestBody
+	email := c.Query("email", "")
+	newsletter_id := c.QueryInt("newsletter_id", -1)
 
-	err := c.BodyParser(&request)
-	if err != nil {
-		return utils.BadRequestResponse(c, "Failed to parse request body")
+	if email == "" || newsletter_id == -1 {
+		return utils.BadRequestResponse(c, "Invalid request")
 	}
 
-	validationErrs := r.Validator.Struct(request)
-	if validationErrs != nil {
-		return utils.BadRequestResponse(c, validationErrs.Error())
-	}
-
-	err = UnsubscribeFromNewsletterOperation(r, request.Email, request.NewsletterID)
+	err := UnsubscribeFromNewsletterOperation(r, email, uint(newsletter_id))
 	if err == gorm.ErrRecordNotFound {
 		return utils.NotFoundResponse(c, "Newsletter not found")
 	} else if err != nil {

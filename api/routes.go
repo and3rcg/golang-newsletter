@@ -2,12 +2,21 @@ package api
 
 import (
 	"newsletter-go/internal"
+	"newsletter-go/tasks"
+	"newsletter-go/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func SetUpAPIRoutes(app *fiber.App, repo *internal.Repository) {
 	newsletterGroup := app.Group("/api/newsletter")
+
+	newsletterGroup.Get("/demo-task", func(c *fiber.Ctx) error {
+		client := tasks.GetWorkerClient()
+		task := tasks.NewTaskDemo(10)
+		client.Enqueue(task)
+		return utils.OkResponse(c, "task started", nil)
+	})
 
 	newsletterGroup.Post("/", func(c *fiber.Ctx) error {
 		return CreateNewsletterHandler(c, repo)
