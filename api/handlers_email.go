@@ -11,7 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// wip
 func SendNewsletterEmailsHandler(c *fiber.Ctx, r *internal.Repository) error {
 	var request models.EmailContent
 	err := c.BodyParser(&request)
@@ -42,10 +41,13 @@ func SendNewsletterEmailsHandler(c *fiber.Ctx, r *internal.Repository) error {
 		return utils.InternalServerErrorResponse(c, err.Error())
 	}
 
-	err = tasks.SendNewsletterEmailsTask(r, newsletterObj, request)
+	task, err := tasks.NewTaskSendNewsletterEmails(*newsletterObj, request)
 	if err != nil {
 		return utils.InternalServerErrorResponse(c, err.Error())
 	}
+
+	client := tasks.GetWorkerClient()
+	client.Enqueue(task)
 
 	return utils.OkResponse(c, "Sending e-mail...", fiber.Map{
 		"data":          request,

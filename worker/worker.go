@@ -1,7 +1,7 @@
 package main
 
-// esse aqui é o servidor, ele vai checar o redis para executar tasks
-// para rodar o worker, execute go run worker/worker.go a partir da raiz do projeto
+// this is the server, it'll listen to Redis' queue and execute tasks whenever
+// usually, it's run via the command go run worker/worker.go from the project's root folder
 
 import (
 	"log"
@@ -28,7 +28,7 @@ func main() {
 	)
 
 	mux := asynq.NewServeMux()
-	mux.HandleFunc(tasks.TypeDemoTask, tasks.HandlerTaskDemo)
+	mux.HandleFunc(tasks.TypeTaskSendNewsletterEmails, tasks.HandlerTaskSendNewsletterEmails)
 	// mux.HandleFunc(tasks.TypeDemoTask, tasks.HandlerTaskDemo)
 	// ^^^^^^ you can register more tasks here by adding more lines accordingly
 

@@ -1,8 +1,5 @@
-version: "3.8"
-
-# courtesy of gemini
-
 services:
+  # courtesy of gemini
   redis:
     image: redis:latest
     environment:
@@ -16,6 +13,28 @@ services:
       interval: 10s  # Check every 10 seconds
       timeout: 5s  # Timeout after 5 seconds
       retries: 3  # Retry 3 times before considering unhealthy
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile_web
+    ports:
+      - 3000:3000
+    # Important to bind/mount your codebase dir to /app dir for live reload
+    volumes:
+      - ./:/app
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    # ports:
+    #   - 3001:3001
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - web
 
 volumes:
   redis-data:  # Define the data volume

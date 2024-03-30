@@ -1,0 +1,312 @@
+{
+	"info": {
+		"_postman_id": "a732aaeb-abd0-4530-868c-794c207adedc",
+		"name": "Newsletter System API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20021237",
+		"_collection_link": "https://dark-satellite-411915.postman.co/workspace/meus-projetos~68ce2ed8-8466-4124-95a2-33dd23fa83d6/collection/20021237-a732aaeb-abd0-4530-868c-794c207adedc?action=share&source=collection_link&creator=20021237"
+	},
+	"item": [
+		{
+			"name": "Newsletters",
+			"item": [
+				{
+					"name": "Create newsletter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"The Formula 1 Newsletter\",\r\n    \"description\": \"The latest news on Formula 1's 2023 season\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get single newsletter",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get newsletter list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Newsletter 1\",\r\n    \"description\": \"Desc newsletter 1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update newsletter",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"The Formula 1 Newsletter\",\r\n    \"description\": \"Your source for all F1 news\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete newsletter",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/1",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Subscribe e-mail to newsletter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"John Doe\",\r\n    \"email\": \"johndoe@yopmail.com\",  // YOPMail is being soft bounced. Try adding a GMail or another service\r\n    \"newsletter_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/subscribe",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"subscribe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unsubscribe e-mail from newsletter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"johndoe@yopmail.com\",\r\n    \"newsletter_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/unsubscribe",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"unsubscribe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "E-mails",
+			"item": [
+				{
+					"name": "Send e-mails from newsletter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"subject\": \"The 2024 Australian GP recap\",\r\n    \"text\": \"Hello world!\",\r\n    \"html\": \"<h1>Carlos Sainz wins the GP a week after appendix surgery</h1><p>Max Verstappen retired on lap 4 due to brake cooling failure</p>\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/newsletter/3/send-emails",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"3",
+								"send-emails"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Demo task test",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/newsletter/demo-task",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"newsletter",
+						"demo-task"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

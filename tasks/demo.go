@@ -1,16 +1,17 @@
 package tasks
 
-// Estrutura geral dos arquivos de tasks:
-// 1. Uma lista de tipos de task. No worker server (worker/worker.go), o mux.HandleFunc cadastra as tasks com os nomes dos tipos,
-// e chamamos eles pelo client
-// 2. Um struct com o payload dos argumentos a serem enviados. Lembra que o Celery precisa de argumentos serializáveis? aqui é igual
-// 3. Função construtora da task: é essa função que vai gerar o payload que a task vai receber para trabalhar
-// 4. Handler da task: é uma func(ctx context.Context, t *asynq.Task) que retorna um erro
+// General structure of the tasks fliles:
+// 1. A list of task types. In the worker's server (worker/worker.go), mux.HandleFunc registers tasks by the names of the types,
+// and we call them via the client (client.Enqueue(task))
+// 2. A struct with the JSON payload of the task's arguments (if applicable).
+// If you're familiar with Celery, you might know that the arguments must be JSON serializable. It works just the same here.
+// 3. The task's constructor function: This function will generate the task's payload and return the task object to be enqueued.
+// 4. Task handler: it's a func(ctx context.Context, t *asynq.Task) that returns an error. This is the task's algorithm itself.
 
-// IMPORTANTE: o handler da task só recebe o payload se for no formato array de bytes (ou json.Marshal)
-// Também podemos cadastrar mais tasks em um arquivo, basta declarar novos tipos de task, payloads, funções construtoras e handlers
+// IMPORTANT: you must pass the payload to the task as an array of bytes (a.k.a use JSON.Marshal)
+// We can also register more than one task in a file, just declare more types, payload structs and handlers, registering them accordingly.
 
-// note que as tasks são chamadas pelo tipo (veja o asynq.NewTask). O server vincula os tipos aos handlers de tasks
+// Notice that the tasks in the constructor are called by their type. The type => handler association is made by the server.
 
 import (
 	"context"
@@ -40,7 +41,7 @@ func NewTaskDemo(timeSeconds uint) *asynq.Task {
 
 	task := asynq.NewTask(TypeDemoTask, payloadBytes)
 
-	// também posso chamar o client direto daqui com client.Enqueue(task)
+	// I can also call the client from here by using client.Enqueue(task) and returning nothing
 
 	return task
 }
