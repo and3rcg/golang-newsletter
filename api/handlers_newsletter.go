@@ -143,8 +143,8 @@ func SubscribeToNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
 	return utils.OkResponse(c, "E-mail added successfully", nil)
 }
 
-// UnsubscribeFromNewsletterHandler removes an e-mail address from the specified newsletter. Duplicates are not allowed.
-func UnsubscribeFromNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
+// UnsubscribeFromNewsletterAPIHandler removes an e-mail address from the specified newsletter. Duplicates are not allowed.
+func UnsubscribeFromNewsletterAPIHandler(c *fiber.Ctx, r *internal.Repository) error {
 	email := c.Query("email", "")
 	newsletter_id := c.QueryInt("newsletter_id", -1)
 
@@ -160,4 +160,20 @@ func UnsubscribeFromNewsletterHandler(c *fiber.Ctx, r *internal.Repository) erro
 	}
 
 	return utils.OkResponse(c, "E-mail removed successfully", nil)
+}
+
+func UnsubscribeFromNewsletterHandler(c *fiber.Ctx, r *internal.Repository) error {
+	email := c.Query("email", "")
+	newsletter_id := c.QueryInt("newsletter_id", -1)
+
+	if email == "" || newsletter_id == -1 {
+		return utils.BadRequestResponse(c, "Invalid request")
+	}
+
+	err := UnsubscribeFromNewsletterOperation(r, email, uint(newsletter_id))
+	if err != nil {
+		return utils.InternalServerErrorResponse(c, err.Error())
+	}
+
+	return c.Render("unsubscribe", fiber.Map{})
 }

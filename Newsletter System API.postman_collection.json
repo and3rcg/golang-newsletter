@@ -232,14 +232,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}/api/newsletter/3/send-emails",
+							"raw": "{{baseURL}}/api/newsletter/1/send-emails",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
 								"api",
 								"newsletter",
-								"3",
+								"1",
 								"send-emails"
 							]
 						}

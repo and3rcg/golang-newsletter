@@ -7,14 +7,17 @@ import (
 	"newsletter-go/tasks"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	engine := html.New("./templates", ".html")
 	app := fiber.New(fiber.Config{
 		Prefork:       false,
 		StrictRouting: true,
 		AppName:       "Newsletters in Go",
+		Views:         engine,
 	})
 
 	err := godotenv.Load()

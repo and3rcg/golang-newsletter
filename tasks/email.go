@@ -73,7 +73,7 @@ func HandlerTaskSendNewsletterEmails(ctx context.Context, t *asynq.Task) error {
 	emailContent := args.Content.ContentHTML + `
 	<hr>
 	<p>
-		<a href="{{ Domain }}/api/newsletter/unsubscribe?email={{ Email }}&newsletter_id={{ ID }}">Click here to unsubscribe from the newsletter</a>
+		<a href="{{ Domain }}/unsubscribe?email={{ Email }}&newsletter_id={{ ID }}">Click here to unsubscribe from the newsletter</a>
 	</p>
 	`
 
@@ -117,5 +117,6 @@ func HandlerTaskSendNewsletterEmails(ctx context.Context, t *asynq.Task) error {
 		}
 	}
 
+	log.Println("E-mails sent successfully!")
 	return nil
 }

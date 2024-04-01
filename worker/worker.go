@@ -24,10 +24,11 @@ func main() {
 			Password: os.Getenv("REDIS_PASSWORD"),
 			DB:       0,
 		},
-		asynq.Config{Concurrency: 2},
+		asynq.Config{Concurrency: 6},
 	)
 
 	mux := asynq.NewServeMux()
+	mux.HandleFunc(tasks.TypeDemoTask, tasks.HandlerTaskDemo) // this is just a task to see if the worker's up (use it alongside docker logs)
 	mux.HandleFunc(tasks.TypeTaskSendNewsletterEmails, tasks.HandlerTaskSendNewsletterEmails)
 	// mux.HandleFunc(tasks.TypeDemoTask, tasks.HandlerTaskDemo)
 	// ^^^^^^ you can register more tasks here by adding more lines accordingly

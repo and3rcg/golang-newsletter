@@ -63,7 +63,7 @@ func UnsubscribeFromNewsletterOperation(repo *internal.Repository, email string,
 
 	result := repo.DB.Where("newsletter_id = ? AND email = ?", newsletterID, email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
-		return nil
+		return nil // ignore if the email is not subscribed to the newsletter
 	} else if result.Error != nil {
 		return result.Error
 	}

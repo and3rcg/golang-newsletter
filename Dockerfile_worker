@@ -1,7 +1,4 @@
-# Dockerfile obtained from https://github.com/cosmtrek/air#installation-and-usage-for-docker-users-who-dont-want-to-use-air-image
-
-# Choose whatever you want, version >= 1.16
-FROM golang:1.22-alpine
+FROM golang:1.21.8-alpine3.19
 
 WORKDIR /app
 

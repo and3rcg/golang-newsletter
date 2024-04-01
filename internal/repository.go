@@ -2,6 +2,7 @@ package internal
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/mail"
 	"newsletter-go/models"
@@ -9,7 +10,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/mailersend/mailersend-go"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +18,6 @@ type Repository struct {
 	DB        *gorm.DB
 	Validator *validator.Validate
 	MS        *mailersend.Mailersend
-	// Redis
 }
 
 var repository *Repository
@@ -59,7 +59,10 @@ func GetRepository() *Repository {
 func StartDB() (*gorm.DB, error) {
 	log.Println("Connecting to database...")
 
-	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
+	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details on DSN
+	dsn := fmt.Sprintf("%s:%s@tcp(db:3306)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_DATABASE"))
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Println("Failed to connect to database")
 		return nil, err

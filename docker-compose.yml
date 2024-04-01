@@ -13,6 +13,23 @@ services:
       interval: 10s  # Check every 10 seconds
       timeout: 5s  # Timeout after 5 seconds
       retries: 3  # Retry 3 times before considering unhealthy
+    depends_on:
+      - db
+
+  # courtesy of gemini
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Replace with your desired password
+      MYSQL_DATABASE: ${MYSQL_DATABASE}  # Optional: Specify the default database name
+      MYSQL_USER: ${MYSQL_USER}  # Optional: Specify a user with limited privileges
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # Optional: Password for the specified user
+    volumes:
+      - mysql-data:/var/lib/mysql  # Persistent data volume
+    ports:
+      - "3306:3306"  # Map container port 3306 to host port 3306
+    expose:
+      - 3306
 
   web:
     build:
@@ -23,6 +40,8 @@ services:
     # Important to bind/mount your codebase dir to /app dir for live reload
     volumes:
       - ./:/app
+    depends_on:
+      - redis
 
   worker:
     build:
@@ -33,8 +52,8 @@ services:
     volumes:
       - ./:/app
     depends_on:
-      - redis
       - web
 
 volumes:
-  redis-data:  # Define the data volume
+  redis-data:
+  mysql-data:
