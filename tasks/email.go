@@ -4,12 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"newsletter-go/internal"
 	"newsletter-go/models"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/hibiken/asynq"
 	"github.com/mailersend/mailersend-go"
 )
@@ -21,15 +25,20 @@ const (
 
 // the struct that contains a task handler's arguments
 type SendEmailTaskPayload struct {
-	Newsletter models.Newsletter
-	Content    models.EmailContent
+	Newsletter   models.Newsletter
+	Content      models.EmailContent
+	TemplateName string
+	Domain       string
 }
 
 // this one will create the payload from the arguments and return the task object to be enqueued
-func NewTaskSendNewsletterEmails(n models.Newsletter, content models.EmailContent) (*asynq.Task, error) {
+// I chose to have an arg called template_name so that it would resemble Django's class based views.
+func NewTaskSendNewsletterEmails(c *fiber.Ctx, n models.Newsletter, content models.EmailContent, template_name string) (*asynq.Task, error) {
 	payload := SendEmailTaskPayload{
-		Newsletter: n,
-		Content:    content,
+		Newsletter:   n,
+		Content:      content,
+		TemplateName: template_name,
+		Domain:       fmt.Sprintf("http://%s", c.Hostname()), // I have to use absolute URLs in the e-mails
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -61,6 +70,26 @@ func HandlerTaskSendNewsletterEmails(ctx context.Context, t *asynq.Task) error {
 		return errors.New("newsletter is empty")
 	}
 
+	// turn the email's HTML file into a string
+	var htmlString string
+	if args.TemplateName != "" {
+		wd, _ := os.Getwd() // working directory do projeto (raiz)
+		filePath := filepath.Join(wd, "templates", args.TemplateName)
+		// Read the file contents into a byte slice
+		htmlData, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Println("Error reading file:", err)
+			return nil
+		}
+
+		// Convert the byte slice to a string
+		htmlString = string(htmlData)
+
+		htmlString = strings.Replace(htmlString, "### CONTENT ###", args.Content.ContentHTML, 1)
+	} else {
+		htmlString = args.Content.ContentHTML
+	}
+
 	backgroundCtx := context.Background()
 	backgroundCtx, cancel := context.WithTimeout(backgroundCtx, 5*time.Second)
 	defer cancel()
@@ -69,13 +98,6 @@ func HandlerTaskSendNewsletterEmails(ctx context.Context, t *asynq.Task) error {
 		Name:  args.Newsletter.Name,
 		Email: os.Getenv("MAILERSEND_DOMAIN"), // go to domains >> manage trial domain >> add SMTP user and get their address
 	}
-
-	emailContent := args.Content.ContentHTML + `
-	<hr>
-	<p>
-		<a href="{{ Domain }}/unsubscribe?email={{ Email }}&newsletter_id={{ ID }}">Click here to unsubscribe from the newsletter</a>
-	</p>
-	`
 
 	// according to the MailerSend API, I can send emails to up to 10 recipients at once, but for some reason
 	// I can only send to one at a time.
@@ -95,7 +117,7 @@ func HandlerTaskSendNewsletterEmails(ctx context.Context, t *asynq.Task) error {
 				Data: map[string]interface{}{
 					"Email":  user.Email,
 					"ID":     args.Newsletter.ID,
-					"Domain": os.Getenv("THIS_DOMAIN"),
+					"Domain": args.Domain,
 				},
 			},
 		}
@@ -105,7 +127,7 @@ func HandlerTaskSendNewsletterEmails(ctx context.Context, t *asynq.Task) error {
 			Recipients:      recipients,
 			Subject:         args.Content.Subject,
 			Text:            args.Content.ContentText,
-			HTML:            emailContent,
+			HTML:            htmlString,
 			Tags:            args.Content.Tags,
 			Personalization: personalization,
 		}

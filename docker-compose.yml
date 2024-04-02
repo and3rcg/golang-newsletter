@@ -30,6 +30,11 @@ services:
       - "3306:3306"  # Map container port 3306 to host port 3306
     expose:
       - 3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 10s  # Check every 10 seconds
+      timeout: 5s  # Timeout after 5 seconds
+      retries: 3  # Retry 3 times before considering unhealthy
 
   web:
     build:
@@ -42,6 +47,7 @@ services:
       - ./:/app
     depends_on:
       - redis
+      - db
 
   worker:
     build:

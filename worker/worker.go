@@ -18,13 +18,21 @@ func main() {
 		log.Fatal("Error loading.env file")
 	}
 
+	// no point in putting queues in this project, but I just want to show that it's possible to do it
 	srv := asynq.NewServer(
 		asynq.RedisClientOpt{
 			Addr:     os.Getenv("REDIS_HOST"),
 			Password: os.Getenv("REDIS_PASSWORD"),
 			DB:       0,
 		},
-		asynq.Config{Concurrency: 6},
+		asynq.Config{
+			Concurrency: 10,
+			Queues: map[string]int{
+				"critical": 6,
+				"default":  3,
+				"low":      1,
+			},
+		},
 	)
 
 	mux := asynq.NewServeMux()

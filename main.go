@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	engine := html.New("./templates", ".html")
+	engine := html.New("./templates/views", ".html")
 	app := fiber.New(fiber.Config{
 		Prefork:       false,
 		StrictRouting: true,

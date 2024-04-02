@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/hibiken/asynq"
 	"gorm.io/gorm"
 )
 
@@ -41,13 +42,13 @@ func SendNewsletterEmailsHandler(c *fiber.Ctx, r *internal.Repository) error {
 		return utils.InternalServerErrorResponse(c, err.Error())
 	}
 
-	task, err := tasks.NewTaskSendNewsletterEmails(*newsletterObj, request)
+	task, err := tasks.NewTaskSendNewsletterEmails(c, *newsletterObj, request, "emails/email_default.html")
 	if err != nil {
 		return utils.InternalServerErrorResponse(c, err.Error())
 	}
 
 	client := tasks.GetWorkerClient()
-	client.Enqueue(task)
+	client.Enqueue(task, asynq.Queue("critical"))
 
 	return utils.OkResponse(c, "Sending e-mail...", fiber.Map{
 		"data":          request,
